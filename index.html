@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <meta name="theme-color" content="#0ea5e9">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="المختبر">
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgZmlsbD0iIzBlYTVlOSIgcng9IjEwMCIvPjxwYXRoIGZpbGw9IiNmZmZmZmYiIGQ9Ik0zNzQuNiAxMTguNmMxMi41LTEyLjUgMzIuOC0xMi41IDQ1LjMgMHMxMi41IDMyLjggMCA0NS4zTDI4OCAyOTUuOFY0MTZoMzJjMTcuNyAwIDMyIDE0LjMgMzIgMzJzLTE0LjMgMzItMzIgMzJIMTkyYy0xNy43IDAtMzItMTQuMy0zMi0zMnMxNC4zLTMyIDMyLTMybDMyVjI5NS44TDkyLjEgMTYzLjljLTEyLjUtMTIuNS0xMi41LTMyLjggMC00NS4zczMyLjgtMTIuNSA0NS4zIDBsMTE4LjYgMTE4LjZWMTI4YzAtMTcuNyAxNC4zLTMyIDMyLTMyczMyIDE0LjMgMzIgMzJ2MTA5LjNsNTQuNi01NC43eiIvPjwvc3ZnPg==">
+    <title>إدارة محاليل المختبر</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Tajawal', 'sans-serif'] }, colors: { primary: '#0ea5e9', secondary: '#10B981', danger: '#EF4444', warning: '#F59E0B' } } } }
+    </script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+    <style>
+        body { background-color: #F3F4F6; -webkit-tap-highlight-color: transparent; }
+        .modal-overlay { background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        ::-webkit-scrollbar { height: 6px; width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        #reader { width: 100%; border-radius: 0.5rem; overflow: hidden; }
+        #reader video { object-fit: cover; }
+    </style>
+
+    <script>
+        (function initPWA() {
+            const svgIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" fill="#0ea5e9" rx="100"/><path fill="#ffffff" d="M374.6 118.6c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3L288 295.8V416h32c17.7 0 32 14.3 32 32s-14.3 32-32 32H192c-17.7 0-32-14.3-32-32s14.3-32 32-32h32V295.8L92.1 163.9c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l118.6 118.6V128c0-17.7 14.3-32 32-32s32 14.3 32 32v109.3l54.6-54.7z"/></svg>`;
+            const base64Icon = 'data:image/svg+xml;base64,' + btoa(svgIcon);
+            const manifest = {
+                name: "إدارة محاليل المختبر", short_name: "مختبري", display: "standalone", background_color: "#F3F4F6", theme_color: "#0ea5e9", dir: "rtl", lang: "ar", start_url: "./", icons: [{ src: base64Icon, sizes: "192x192 512x512", type: "image/svg+xml", purpose: "any maskable" }]
+            };
+            const link = document.createElement('link'); link.rel = 'manifest'; link.href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: 'application/json' })); document.head.appendChild(link);
+        })();
+    </script>
+</head>
+<body class="text-gray-800 antialiased min-h-screen flex flex-col">
+
+    <datalist id="lab-items-db">
+        <option value="Alinity - Reagent"><option value="Alinity - Control"><option value="Alinity - Calibrator">
+        <option value="ACL Top - Reagent"><option value="ACL Top - Control">
+        <option value="Mindray - Reagent"><option value="Mindray - Control">
+        <option value="Blood Culture Bottles (Aerobic)"><option value="Blood Culture Bottles (Anaerobic)">
+        <option value="Microscan - Panels"><option value="Microscan - Reagents">
+        <option value="Blood Bank Cards (ABO/Rh)"><option value="Blood Bank - Screening Cells">
+        <option value="Urine Analysis Strips"><option value="Urine Analysis Control">
+        <option value="GEM - Cartridge (Blood Gas)"><option value="GEM - CVP">
+        <option value="Glucometer - Strips"><option value="Glucometer - Control">
+        <option value="General - Calibration Kit"><option value="General - Control Level 1/2/3">
+    </datalist>
+
+    <div id="loadingScreen" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary mb-4"></div>
+        <h2 class="text-xl font-bold text-gray-700">جاري الاتصال بنظام المختبر...</h2>
+    </div>
+
+    <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="bg-primary text-white p-2 rounded-lg"><i class="fa-solid fa-flask-vial text-xl"></i></div>
+                    <span class="font-bold text-lg sm:text-xl text-gray-900">إدارة المحاليل</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-xs sm:text-sm text-gray-500 bg-gray-100 px-3 py-1.5 rounded-full flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-secondary"></span>متصل
+                    </span>
+                    <button id="logsBtnContainer" onclick="openLogsModal()" class="hidden bg-purple-100 text-purple-700 text-sm font-medium py-1.5 px-3 rounded-lg items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left"></i><span class="hidden sm:inline">السجل</span>
+                    </button>
+                    <button id="adminToggleBtn" onclick="toggleAdminState()" class="bg-gray-100 text-gray-700 text-sm font-medium py-1.5 px-3 rounded-lg flex items-center gap-2">
+                        <i class="fa-solid fa-user-shield"></i><span class="hidden sm:inline" id="adminToggleText">إدارة</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex items-center gap-4">
+                <div class="bg-blue-100 text-blue-600 p-3 rounded-full"><i class="fa-solid fa-vials text-xl"></i></div>
+                <div><p class="text-xs font-medium text-gray-500 mb-1">إجمالي المحاليل</p><h3 id="statTotalProducts" class="text-2xl font-bold text-gray-900">0</h3></div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex items-center gap-4">
+                <div class="bg-orange-100 text-orange-600 p-3 rounded-full"><i class="fa-solid fa-calendar-xmark text-xl"></i></div>
+                <div><p class="text-xs font-medium text-gray-500 mb-1">قاربت على الانتهاء</p><h3 id="statExpiringSoon" class="text-2xl font-bold text-gray-900">0</h3></div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 flex items-center gap-4">
+                <div class="bg-red-100 text-red-600 p-3 rounded-full"><i class="fa-solid fa-battery-quarter text-xl"></i></div>
+                <div><p class="text-xs font-medium text-gray-500 mb-1">صنف قارب على النفاذ</p><h3 id="statLowStock" class="text-2xl font-bold text-gray-900">0</h3></div>
+            </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="relative w-full sm:w-1/2 flex gap-2">
+                <div class="relative w-full">
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"><i class="fa-solid fa-search text-gray-400"></i></div>
+                    <input type="text" id="searchInput" placeholder="بحث بالاسم، الباركود، أو التشغيلة..." class="block w-full pl-3 pr-10 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-primary focus:border-primary">
+                </div>
+                <button onclick="openScannerModal('searchInput')" class="bg-gray-100 text-gray-700 p-2.5 rounded-lg border border-gray-300 flex-shrink-0"><i class="fa-solid fa-barcode text-lg"></i></button>
+            </div>
+            <button onclick="openProductModal()" class="w-full sm:w-auto bg-primary hover:bg-blue-600 text-white font-medium py-2.5 px-6 rounded-lg flex items-center justify-center gap-2"><i class="fa-solid fa-plus"></i> إضافة محلول</button>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">المحلول</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">الباركود/التشغيلة</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">الصلاحية</th>
+                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">الكمية (العلب والقطع)</th>
+                            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">إجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTableBody" class="bg-white divide-y divide-gray-200"></tbody>
+                </table>
+            </div>
+            <div id="emptyState" class="hidden flex-col items-center justify-center py-12 text-gray-500 px-4 text-center">
+                <i class="fa-solid fa-flask text-4xl mb-3 text-gray-300"></i><p class="text-lg">المخزون فارغ أو لا توجد نتائج.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- نافذة الإضافة والتعديل مع التفاصيل الجديدة -->
+    <div id="productModal" class="fixed inset-0 z-40 hidden modal-overlay items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl mx-auto fade-in flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center border-b border-gray-200 px-5 py-4">
+                <h3 id="modalTitle" class="text-lg font-bold text-gray-900">إضافة محلول جديد</h3>
+                <button onclick="closeProductModal()" class="text-gray-400"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <div class="p-5 overflow-y-auto custom-scroll">
+                <form id="productForm" class="space-y-4">
+                    <input type="hidden" id="productId">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">اسم المحلول / الصنف <span class="text-red-500">*</span></label>
+                            <input type="text" id="productName" list="lab-items-db" required class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">الباركود <span class="text-red-500">*</span></label>
+                            <div class="flex gap-2">
+                                <input type="text" id="productBarcode" required class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary">
+                                <button type="button" onclick="openScannerModal('productBarcode')" class="bg-gray-100 border border-gray-300 px-3 rounded-lg"><i class="fa-solid fa-camera"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">تصنيف الجهاز / القسم</label>
+                            <select id="productCategory" required class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary">
+                                <option value="Alinity">جهاز Alinity</option>
+                                <option value="ACL Top">جهاز ACL Top</option>
+                                <option value="Mindray">جهاز Mindray</option>
+                                <option value="Blood Cultures">مزارع الدم (Blood Cultures)</option>
+                                <option value="Microscan">جهاز Microscan</option>
+                                <option value="GEM">غازات الدم (GEM)</option>
+                                <option value="Urine Analysis">تحليل البول</option>
+                                <option value="Blood Bank">كروت بنك الدم</option>
+                                <option value="Glucometer">أجهزة السكر (Glucometer)</option>
+                                <option value="Controls & Calibrators">كونترول / كالبريشن</option>
+                                <option value="أخرى">أخرى</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">الشركة المصنعة</label>
+                            <input type="text" id="productManufacturer" class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">رقم التشغيلة (Lot) <span class="text-red-500">*</span></label>
+                            <input type="text" id="productLotNumber" required class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">تاريخ الصلاحية <span class="text-red-500">*</span></label>
+                            <input type="date" id="productExpiration" required class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-primary focus:border-primary">
+                        </div>
+                    </div>
+
+                    <!-- نظام إدخال الكميات المطور -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-blue-50 p-4 rounded-xl border border-blue-100">
+                        <div class="col-span-2 sm:col-span-4"><p class="text-sm font-bold text-blue-800 mb-1"><i class="fa-solid fa-boxes-stacked"></i> تفاصيل الكمية ومحتوى العلبة</p></div>
+                        
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">عدد العلب <span class="text-red-500">*</span></label>
+                            <input type="number" id="productBoxQty" min="0" required class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-primary font-bold text-center">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">القطع داخل العلبة <span class="text-red-500">*</span></label>
+                            <input type="number" id="productUnitsPerBox" min="1" value="1" required class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-primary font-bold text-center">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1">نوع القطعة</label>
+                            <select id="productUnitName" class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-primary">
+                                <option value="كارتلج">كارتلج (Cartridge)</option>
+                                <option value="شريط">شريط (Strip)</option>
+                                <option value="اختبار">اختبار (Test)</option>
+                                <option value="أمبولة">أمبولة (Vial)</option>
+                                <option value="علبة">علبة كاملة (بدون قطع)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 mb-1" title="إذا كان لديك كراتين مفتوحة">قطع خارج العلبة</label>
+                            <input type="number" id="productLooseQty" min="0" value="0" required class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-primary font-bold text-center">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="border-t border-gray-200 px-5 py-4 flex justify-end gap-3 bg-gray-50 rounded-b-xl">
+                <button onclick="closeProductModal()" class="bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg text-sm">إلغاء</button>
+                <button onclick="saveProduct()" id="saveBtn" class="bg-primary text-white py-2 px-6 rounded-lg text-sm flex items-center gap-2"><i class="fa-solid fa-save"></i> حفظ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة السحب المفصلة -->
+    <div id="withdrawModal" class="fixed inset-0 z-[50] hidden modal-overlay items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-sm mx-auto fade-in p-6">
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                <h3 class="text-lg font-bold text-gray-900"><i class="fa-solid fa-box-open text-orange-500 ml-2"></i> سحب كمية مستهلكة</h3>
+                <button onclick="closeWithdrawModal()" class="text-gray-400"><i class="fa-solid fa-xmark text-xl"></i></button>
+            </div>
+            <p class="text-sm text-gray-600 mb-1">المحلول: <span id="withdrawProductName" class="font-bold text-gray-900"></span></p>
+            <p class="text-sm text-gray-600 mb-4 bg-green-50 p-2 rounded text-center">المتاح: <span id="withdrawAvailableQty" class="font-bold text-green-700"></span></p>
+            
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                    <label class="block text-xs font-bold text-gray-700 mb-2 text-center">سحب (علبة)</label>
+                    <input type="number" id="withdrawBoxQty" min="0" value="0" class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-center text-lg font-bold focus:ring-orange-500 focus:border-orange-500">
+                </div>
+                <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                    <label id="withdrawLooseLabel" class="block text-xs font-bold text-gray-700 mb-2 text-center">سحب (قطعة)</label>
+                    <input type="number" id="withdrawLooseQty" min="0" value="0" class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-center text-lg font-bold focus:ring-orange-500 focus:border-orange-500">
+                </div>
+            </div>
+            <div id="withdrawError" class="text-red-500 text-xs mb-3 hidden text-center font-bold bg-red-50 p-2 rounded">الكمية المطلوبة أكبر من المتوفر في المخزون!</div>
+            
+            <div class="flex gap-3">
+                <button onclick="closeWithdrawModal()" class="flex-1 bg-gray-100 py-2.5 rounded-lg text-sm font-bold">إلغاء</button>
+                <button id="confirmWithdrawBtn" class="flex-1 bg-warning text-white py-2.5 rounded-lg text-sm font-bold flex justify-center items-center gap-2"><i class="fa-solid fa-check"></i> تأكيد الخصم</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نوافذ أخرى (باركود، تسجيل الدخول، حذف، سجل) -->
+    <div id="scannerModal" class="fixed inset-0 z-[60] hidden modal-overlay items-center justify-center p-4"><div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-auto fade-in flex flex-col"><div class="flex justify-between items-center border-b border-gray-200 px-4 py-3"><h3 class="text-lg font-bold text-gray-900">امسح الباركود</h3><button onclick="closeScannerModal()" class="text-gray-400"><i class="fa-solid fa-xmark text-xl"></i></button></div><div class="p-4 flex flex-col items-center"><div id="reader" class="border-2 border-dashed border-gray-300 bg-black min-h-[250px] w-full"></div></div><div class="px-4 py-3 bg-gray-50 rounded-b-xl border-t border-gray-200"><button onclick="closeScannerModal()" class="w-full bg-white border border-gray-300 py-2 rounded-lg text-sm">إغلاق</button></div></div></div>
+    <div id="adminAuthModal" class="fixed inset-0 z-[60] hidden modal-overlay items-center justify-center p-4"><div class="bg-white rounded-xl shadow-xl w-full max-w-sm mx-auto fade-in p-6 text-center"><div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4 text-primary"><i class="fa-solid fa-lock text-xl"></i></div><h3 class="text-lg font-bold text-gray-900 mb-2">تسجيل دخول الإدارة</h3><input type="password" id="adminPassword" class="block w-full border border-gray-300 rounded-lg px-3 py-2 text-center mb-4"><div id="adminAuthError" class="text-red-500 text-xs mb-3 hidden">رمز المرور غير صحيح</div><div class="flex gap-3"><button onclick="closeAdminAuthModal()" class="flex-1 bg-gray-100 py-2 rounded-lg text-sm">إلغاء</button><button onclick="verifyAdmin()" class="flex-1 bg-primary text-white py-2 rounded-lg text-sm">دخول</button></div></div></div>
+    <div id="deleteModal" class="fixed inset-0 z-[55] hidden modal-overlay items-center justify-center p-4"><div class="bg-white rounded-xl shadow-xl w-full max-w-xs mx-auto p-6 text-center"><h3 class="text-lg font-bold mb-4">تأكيد الحذف</h3><div class="flex gap-3"><button onclick="closeDeleteModal()" class="flex-1 bg-gray-100 py-2 rounded-lg text-sm">إلغاء</button><button id="confirmDeleteBtn" class="flex-1 bg-danger text-white py-2 rounded-lg text-sm">حذف</button></div></div></div>
+    <div id="logsModal" class="fixed inset-0 z-[60] hidden modal-overlay items-center justify-center p-4"><div class="bg-white rounded-xl shadow-xl w-full max-w-2xl mx-auto flex flex-col max-h-[90vh]"><div class="flex justify-between items-center border-b px-5 py-4"><h3 class="text-lg font-bold">سجل العمليات (إضافة و سحب)</h3><button onclick="closeLogsModal()" class="text-gray-400"><i class="fa-solid fa-xmark"></i></button></div><div class="p-0 overflow-y-auto flex-grow"><ul id="logsList" class="divide-y divide-gray-100"></ul></div></div></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "demo", authDomain: "demo", projectId: "demo" };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const appId = 'lab-inventory-final';
+
+        let products = [], logs = [], currentUser = null, isAdmin = false, productToDelete = null, html5QrCode = null, currentScannerTargetId = null, productToWithdraw = null;
+
+        // حل مشكلة التصفح الخفي في متصفح سفاري (Safari Private Mode Fix)
+        try { 
+            isAdmin = localStorage.getItem('labAdmin') === 'true'; 
+        } catch(e) { 
+            console.warn('تنبيه سفاري: وضع التصفح الخفي مفعل، تم إيقاف التخزين المحلي.'); 
+        }
+
+        signInAnonymously(auth).then(userCred => { 
+            currentUser = userCred.user; 
+            fetchProducts(); 
+            fetchLogs(); 
+        }).catch(error => {
+            console.error(error);
+            document.getElementById('loadingScreen').innerHTML = '<div class="text-center text-red-500 font-bold p-4"><i class="fa-solid fa-triangle-exclamation text-4xl mb-2"></i><br>عذراً، سفاري يمنع الاتصال. يرجى إغلاق وضع "التصفح الخفي" أو التأكد من رفع الموقع على رابط حقيقي.</div>';
+        });
+
+        function fetchProducts() {
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'lab_data'), snapshot => {
+                products = []; snapshot.forEach(doc => products.push({ id: doc.id, ...doc.data() }));
+                document.getElementById('loadingScreen').classList.add('hidden'); renderUI();
+            });
+        }
+
+        function fetchLogs() {
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'lab_logs'), snapshot => {
+                logs = []; snapshot.forEach(doc => logs.push({ id: doc.id, ...doc.data() }));
+                logs.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0)); renderLogs();
+            });
+        }
+
+        function renderUI() {
+            const toggleText = document.getElementById('adminToggleText'), toggleBtn = document.getElementById('adminToggleBtn'), logsBtn = document.getElementById('logsBtnContainer');
+            if (isAdmin) { toggleText.textContent = 'خروج'; toggleBtn.classList.replace('bg-gray-100', 'bg-red-50'); toggleBtn.classList.replace('text-gray-700', 'text-red-600'); logsBtn.classList.remove('hidden'); logsBtn.classList.add('flex'); } 
+            else { toggleText.textContent = 'إدارة'; toggleBtn.classList.replace('bg-red-50', 'bg-gray-100'); toggleBtn.classList.replace('text-red-600', 'text-gray-700'); logsBtn.classList.add('hidden'); logsBtn.classList.remove('flex'); }
+            updateDashboard(); renderTable();
+        }
+
+        function updateDashboard() {
+            let expCount = 0, lowCount = 0; const today = new Date(); today.setHours(0,0,0,0);
+            products.forEach(p => {
+                const upb = p.unitsPerBox || 1;
+                const boxes = Math.floor(p.quantity / upb);
+                if (boxes < 1 || (boxes === 1 && p.quantity <= (upb * 1.2))) lowCount++;
+                if (p.expirationDate && Math.ceil((new Date(p.expirationDate) - today) / 86400000) < 30) expCount++;
+            });
+            document.getElementById('statTotalProducts').textContent = products.length;
+            document.getElementById('statExpiringSoon').textContent = expCount;
+            document.getElementById('statLowStock').textContent = lowCount;
+        }
+
+        function renderTable() {
+            const term = document.getElementById('searchInput').value.trim().toLowerCase(), today = new Date(); today.setHours(0,0,0,0);
+            const filtered = products.filter(p => p.name.toLowerCase().includes(term) || p.barcode.toLowerCase().includes(term) || (p.lotNumber && p.lotNumber.toLowerCase().includes(term)));
+            const tbody = document.getElementById('productsTableBody');
+            
+            if (!filtered.length) { 
+                document.getElementById('emptyState').classList.remove('hidden'); 
+                document.getElementById('emptyState').classList.add('flex'); 
+                tbody.innerHTML = '';
+                return; 
+            }
+            
+            document.getElementById('emptyState').classList.add('hidden'); 
+            document.getElementById('emptyState').classList.remove('flex');
+
+            // تجميع محتوى الجدول في متغير واحد لزيادة السرعة (Batch Rendering)
+            let tableHTML = '';
+
+            filtered.forEach(p => {
+                const upb = p.unitsPerBox || 1; const uName = p.unitName || 'قطعة';
+                const boxes = Math.floor(p.quantity / upb); const loose = p.quantity % upb;
+                
+                let qtyText = '';
+                if (upb > 1) { qtyText = `${boxes} علبة`; if (loose > 0) qtyText += ` و <span class="text-orange-600">${loose} ${uName}</span>`; } 
+                else { qtyText = `${p.quantity} علبة`; }
+                if (p.quantity === 0) qtyText = "نافذ";
+
+                let qtyClass = p.quantity <= 0 ? "border-red-500 bg-red-50" : (boxes < 1) ? "border-orange-500 bg-orange-50" : "border-gray-200 bg-white";
+                let expClass = "text-gray-900";
+                if (p.expirationDate) {
+                    const days = Math.ceil((new Date(p.expirationDate) - today) / 86400000);
+                    if (days < 0) expClass = "text-red-600 font-bold"; else if (days < 30) expClass = "text-orange-500 font-bold";
+                }
+
+                tableHTML += `
+                    <tr class="hover:bg-gray-50 border-b border-gray-100">
+                        <td class="px-4 py-3"><div class="text-sm font-bold text-gray-900">${p.name}</div><div class="text-xs text-gray-500">${p.category} | ${p.manufacturer || ''}</div></td>
+                        <td class="px-4 py-3"><div class="text-xs text-gray-600 mb-1"><i class="fa-solid fa-barcode"></i> ${p.barcode}</div><div class="text-xs bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded inline-block">Lot: ${p.lotNumber}</div></td>
+                        <td class="px-4 py-3 text-xs ${expClass}">${p.expirationDate ? new Date(p.expirationDate).toLocaleDateString('ar-SA') : '-'}</td>
+                        <td class="px-4 py-3 text-center">
+                            <div class="px-3 py-1.5 text-sm font-bold rounded-lg border ${qtyClass} inline-block shadow-sm">${qtyText}</div>
+                            ${upb > 1 && p.quantity > 0 ? `<div class="text-[10px] text-gray-500 mt-1">الإجمالي: ${p.quantity} ${uName}</div>` : ''}
+                        </td>
+                        <td class="px-4 py-3 text-right whitespace-nowrap">
+                            <button onclick="openWithdrawModal('${p.id}')" class="bg-orange-100 text-orange-600 hover:bg-orange-200 px-3 py-1.5 rounded-lg mr-1 text-xs font-bold" title="سحب كمية"><i class="fa-solid fa-box-open"></i> سحب</button>
+                            <button onclick="editProduct('${p.id}')" class="text-blue-500 hover:bg-blue-50 p-1.5 rounded mr-1" title="تعديل"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="confirmDelete('${p.id}')" class="text-red-500 hover:bg-red-50 p-1.5 rounded" title="حذف"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+            });
+            
+            // حقن البيانات دفعة واحدة لضمان سرعة فائقة
+            tbody.innerHTML = tableHTML;
+        }
+
+        // استخدام تقنية (Debounce) لمنع تحديث الجدول مع كل حرف نكتبه والانتظار قليلاً لزيادة السرعة
+        let searchTimeout;
+        document.getElementById('searchInput').addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(renderTable, 200); 
+        });
+
+        // الإضافة والتعديل
+        window.openProductModal = (isEdit = false) => {
+            if(!isAdmin) { alert("يجب تسجيل الدخول كمدير أولاً."); return; }
+            document.getElementById('modalTitle').textContent = isEdit ? 'تعديل بيانات المحلول' : 'إضافة محلول جديد';
+            if (!isEdit) { document.getElementById('productForm').reset(); document.getElementById('productId').value = ''; }
+            document.getElementById('productModal').classList.remove('hidden'); document.getElementById('productModal').classList.add('flex');
+        }
+        window.closeProductModal = () => { document.getElementById('productModal').classList.add('hidden'); document.getElementById('productModal').classList.remove('flex'); }
+
+        async function logAction(action, name, details) {
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'lab_logs'), { action, productName: name, details, timestamp: serverTimestamp() });
+        }
+
+        window.saveProduct = async () => {
+            const form = document.getElementById('productForm'); if (!form.checkValidity()) return form.reportValidity();
+            const id = document.getElementById('productId').value, btn = document.getElementById('saveBtn'); btn.disabled = true;
+            
+            const bQty = Number(document.getElementById('productBoxQty').value) || 0;
+            const lQty = Number(document.getElementById('productLooseQty').value) || 0;
+            const upb = Number(document.getElementById('productUnitsPerBox').value) || 1;
+            const uName = document.getElementById('productUnitName').value;
+            const totalUnits = (bQty * upb) + lQty;
+
+            const data = {
+                name: document.getElementById('productName').value.trim(), barcode: document.getElementById('productBarcode').value.trim(),
+                manufacturer: document.getElementById('productManufacturer').value.trim(), category: document.getElementById('productCategory').value,
+                lotNumber: document.getElementById('productLotNumber').value.trim(), expirationDate: document.getElementById('productExpiration').value,
+                quantity: totalUnits, unitsPerBox: upb, unitName: uName
+            };
+            try {
+                if (id) { await updateDoc(doc(db, 'artifacts', appId, 'public', 'lab_data', id), data); await logAction('تعديل', data.name, `تم تعديل الرصيد إلى الإجمالي: ${data.quantity} ${uName}`); }
+                else { await addDoc(collection(db, 'artifacts', appId, 'public', 'lab_data'), data); await logAction('إضافة', data.name, `تمت الإضافة. الإجمالي: ${data.quantity} ${uName}`); }
+                closeProductModal();
+            } catch(e) {} finally { btn.disabled = false; }
+        }
+
+        window.editProduct = id => {
+            const p = products.find(x => x.id === id);
+            if (p && isAdmin) {
+                document.getElementById('productId').value = p.id; document.getElementById('productName').value = p.name;
+                document.getElementById('productBarcode').value = p.barcode; document.getElementById('productManufacturer').value = p.manufacturer;
+                document.getElementById('productCategory').value = p.category; document.getElementById('productLotNumber').value = p.lotNumber;
+                document.getElementById('productExpiration').value = p.expirationDate;
+                
+                const upb = p.unitsPerBox || 1;
+                document.getElementById('productUnitsPerBox').value = upb;
+                document.getElementById('productUnitName').value = p.unitName || 'كارتلج';
+                document.getElementById('productBoxQty').value = Math.floor(p.quantity / upb);
+                document.getElementById('productLooseQty').value = p.quantity % upb;
+
+                openProductModal(true);
+            } else if (!isAdmin) alert("يجب الدخول كمدير.");
+        }
+
+        // السحب المطور
+        window.openWithdrawModal = id => {
+            if(!isAdmin) { alert("يجب تسجيل الدخول كمدير لتتمكن من سحب المحاليل."); return; }
+            productToWithdraw = products.find(x => x.id === id);
+            if(productToWithdraw) {
+                const upb = productToWithdraw.unitsPerBox || 1; const uName = productToWithdraw.unitName || 'قطعة';
+                const boxes = Math.floor(productToWithdraw.quantity / upb); const loose = productToWithdraw.quantity % upb;
+                let availText = upb > 1 ? `${boxes} علبة و ${loose} ${uName}` : `${productToWithdraw.quantity} علبة`;
+
+                document.getElementById('withdrawProductName').textContent = productToWithdraw.name;
+                document.getElementById('withdrawAvailableQty').textContent = availText + ` (الإجمالي: ${productToWithdraw.quantity})`;
+                
+                document.getElementById('withdrawBoxQty').value = 0; document.getElementById('withdrawBoxQty').max = boxes;
+                document.getElementById('withdrawLooseQty').value = upb > 1 ? 1 : 0; document.getElementById('withdrawLooseQty').max = productToWithdraw.quantity;
+                document.getElementById('withdrawLooseLabel').textContent = `سحب (${uName})`;
+                document.getElementById('withdrawError').classList.add('hidden');
+                
+                document.getElementById('withdrawModal').classList.remove('hidden'); document.getElementById('withdrawModal').classList.add('flex');
+            }
+        }
+        
+        window.closeWithdrawModal = () => { document.getElementById('withdrawModal').classList.add('hidden'); document.getElementById('withdrawModal').classList.remove('flex'); }
+        
+        document.getElementById('confirmWithdrawBtn').addEventListener('click', async function() {
+            if(!productToWithdraw) return;
+            const upb = productToWithdraw.unitsPerBox || 1; const uName = productToWithdraw.unitName || 'قطعة';
+            const wBoxes = Number(document.getElementById('withdrawBoxQty').value) || 0;
+            const wLoose = Number(document.getElementById('withdrawLooseQty').value) || 0;
+            
+            const totalToWithdraw = (wBoxes * upb) + wLoose;
+            
+            if(totalToWithdraw <= 0 || totalToWithdraw > productToWithdraw.quantity) { document.getElementById('withdrawError').classList.remove('hidden'); return; }
+            
+            const btn = this; btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> جاري الخصم...';
+            
+            try {
+                const newQuantity = productToWithdraw.quantity - totalToWithdraw;
+                const remBoxes = Math.floor(newQuantity / upb); const remLoose = newQuantity % upb;
+                const remainingText = upb > 1 ? `${remBoxes} علبة و ${remLoose} ${uName}` : `${newQuantity} علبة`;
+                let withdrawnText = wBoxes > 0 ? `${wBoxes} علبة` : '';
+                if(wLoose > 0) withdrawnText += (withdrawnText ? ' و ' : '') + `${wLoose} ${uName}`;
+
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'lab_data', productToWithdraw.id), { quantity: newQuantity });
+                await logAction('سحب', productToWithdraw.name, `تم سحب (${withdrawnText}). المتبقي: ${remainingText}`);
+                closeWithdrawModal();
+            } catch(e) { alert("حدث خطأ أثناء السحب"); } finally { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-check"></i> تأكيد الخصم'; }
+        });
+
+        // دوال مساعدة
+        window.confirmDelete = id => { if(!isAdmin) return; productToDelete = id; document.getElementById('deleteModal').classList.remove('hidden'); document.getElementById('deleteModal').classList.add('flex'); }
+        window.closeDeleteModal = () => { document.getElementById('deleteModal').classList.add('hidden'); document.getElementById('deleteModal').classList.remove('flex'); }
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
+            const btn = this; btn.disabled = true; const p = products.find(x => x.id === productToDelete);
+            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'lab_data', productToDelete));
+            if(p) await logAction('حذف', p.name, 'تم الحذف النهائي من المخزون');
+            closeDeleteModal(); btn.disabled = false;
+        });
+
+        window.toggleAdminState = () => { 
+            if (isAdmin) { 
+                isAdmin = false; 
+                try { localStorage.setItem('labAdmin', 'false'); } catch(e){} 
+                renderUI(); 
+            } else { 
+                document.getElementById('adminPassword').value = ''; 
+                document.getElementById('adminAuthError').classList.add('hidden'); 
+                document.getElementById('adminAuthModal').classList.remove('hidden'); 
+                document.getElementById('adminAuthModal').classList.add('flex'); 
+            } 
+        }
+        
+        window.closeAdminAuthModal = () => { document.getElementById('adminAuthModal').classList.add('hidden'); document.getElementById('adminAuthModal').classList.remove('flex'); }
+        
+        window.verifyAdmin = () => { 
+            if (document.getElementById('adminPassword').value === '00000') { 
+                isAdmin = true; 
+                try { localStorage.setItem('labAdmin', 'true'); } catch(e){} 
+                closeAdminAuthModal(); 
+                renderUI(); 
+            } else { 
+                document.getElementById('adminAuthError').classList.remove('hidden'); 
+            } 
+        }
+
+        window.openScannerModal = targetId => {
+            currentScannerTargetId = targetId; document.getElementById('scannerModal').classList.remove('hidden'); document.getElementById('scannerModal').classList.add('flex');
+            html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 150 } }, text => {
+                const input = document.getElementById(currentScannerTargetId); if (input) { input.value = text; input.dispatchEvent(new Event('input', { bubbles: true })); } closeScannerModal();
+            }, err => {}).catch(err => alert("تعذر فتح الكاميرا"));
+        }
+        window.closeScannerModal = () => { if (html5QrCode && html5QrCode.isScanning) html5QrCode.stop().then(() => html5QrCode.clear()); document.getElementById('scannerModal').classList.add('hidden'); document.getElementById('scannerModal').classList.remove('flex'); }
+
+        window.openLogsModal = () => { document.getElementById('logsModal').classList.remove('hidden'); document.getElementById('logsModal').classList.add('flex'); }
+        window.closeLogsModal = () => { document.getElementById('logsModal').classList.add('hidden'); document.getElementById('logsModal').classList.remove('flex'); }
+        
+        function renderLogs() {
+            const list = document.getElementById('logsList');
+            let logsHTML = ''; // تجميع أكواد السجل في متغير واحد للسرعة
+            
+            logs.forEach(log => {
+                let actionColor = log.action === 'سحب' ? 'text-orange-600' : (log.action === 'إضافة' ? 'text-green-600' : 'text-blue-600');
+                if(log.action === 'حذف') actionColor = 'text-red-600';
+                const time = log.timestamp ? new Date(log.timestamp.seconds * 1000).toLocaleString('ar-SA') : 'الآن';
+                
+                logsHTML += `<li class="p-4 flex gap-4 border-b hover:bg-gray-50"><div class="text-sm w-full"><b class="${actionColor}">${log.action}: ${log.productName}</b><br><span class="text-gray-700 font-medium">${log.details}</span><br><span class="text-xs text-gray-400 mt-1 block">${time}</span></div></li>`;
+            });
+            
+            // تحديث واجهة السجل دفعة واحدة
+            list.innerHTML = logsHTML;
+        }
+    </script>
+</body>
+</html>
